@@ -3,15 +3,20 @@ import { useState } from "react";
 export default App;
 
 function App() {
-  const [items, setItems] = useState([
-    { id: 1, description: "Passports", quantity: 2, packed: false },
-    { id: 2, description: "Socks", quantity: 12, packed: true },
-  ]);
+  const [items, setItems] = useState([]);
+
+  const handleAddItems = (newItem) => {
+    setItems(() => [...items, newItem]);
+  };
+  const handleDeleteItems = (id) => {
+    setItems((items) => items.filter((item) => item.id !== id));
+  };
+
   return (
     <div className="app">
       <Logo />
-      <Form items={items} setItems={setItems} />
-      <PackingList items={items} />
+      <Form onAddItems={handleAddItems} />
+      <PackingList items={items} onDeleteItems={handleDeleteItems} />
       <Stats />
     </div>
   );
@@ -21,22 +26,20 @@ const Logo = () => {
   return <h1>🧳 Far Away 🏖️</h1>;
 };
 
-const Form = ({ items, setItems }) => {
+const Form = ({ onAddItems }) => {
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
 
   const handleSubmit = (e) => {
+    const newItem = {
+      id: Date.now(),
+      description: description,
+      quantity: quantity,
+      packed: false,
+    };
     e.preventDefault();
     if (!description) return;
-    setItems([
-      ...items,
-      {
-        id: items.length + 1,
-        description: description,
-        quantity: quantity,
-        packed: false,
-      },
-    ]);
+    onAddItems(newItem);
     setDescription("");
     setQuantity(1);
   };
@@ -64,12 +67,12 @@ const Form = ({ items, setItems }) => {
     </form>
   );
 };
-const PackingList = ({ items }) => {
+const PackingList = ({ items, onDeleteItems }) => {
   return (
     <div className="list">
       <ul>
         {items.map((item) => (
-          <Item item={item} key={item.id} />
+          <Item item={item} onDeleteItems={onDeleteItems} key={item.id} />
         ))}
       </ul>
     </div>
@@ -83,13 +86,15 @@ const Stats = () => {
   );
 };
 
-const Item = ({ item }) => {
+const Item = ({ item, onDeleteItems }) => {
   return (
     <li key={item.id}>
       <span style={item.packed ? { textDecoration: "line-through" } : {}}>
         {item.quantity} {item.description}
       </span>
-      <button>{item.packed ? "✅" : "❌"}</button>
+      <button onClick={() => onDeleteItems(item.id)}>
+        {item.packed ? "✅" : "❌"}
+      </button>
     </li>
   );
 };
