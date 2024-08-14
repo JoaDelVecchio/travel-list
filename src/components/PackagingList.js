@@ -10,7 +10,7 @@ const PackingList = ({
 }) => {
   const [sortOption, setSortOption] = useState("sort by input");
 
-  const handleSort = (e, sortOption, setSortOption) => {
+  const handleSort = (e) => {
     const selectedSortedOption = e.target.value;
     setSortOption(selectedSortedOption);
     setItems((items) =>
@@ -22,6 +22,10 @@ const PackingList = ({
           : b.packed - a.packed; // Ordenar por estado de empaquetado (packed)
       })
     );
+  };
+
+  const handleClear = () => {
+    setItems([]);
   };
 
   return (
@@ -47,6 +51,7 @@ const PackingList = ({
           <option value="description">sort by description</option>
           <option value="packed">sort by packed</option>
         </select>
+        <button onClick={handleClear}>Clear</button>
       </div>
     </div>
   );
